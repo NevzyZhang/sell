@@ -15,29 +15,83 @@
           <span class="text">{{ seller.supports[0].description }}</span>
         </div>
       </div>
-      <div class="support-count" v-if="seller.supports">
+      <div class="support-count" v-if="seller.supports" v-on:click="showDetail">
         <span class="count">{{ seller.supports.length }} 个</span>
         <i class="icon-keyboard_arrow_right"></i>
       </div>
     </div>
-    <div class="bulletin-wrapper">
+    <div class="bulletin-wrapper" v-on:click="showDetail">
       <span class="bulletin-title"></span>
       <span class="bulletin-text">{{ seller.bulletin }}</span>
       <i class="icon-keyboard_arrow_right"></i>
     </div>
-
+    <div class="background">
+      <img width="100%" height="100%" v-bind:src="seller.avatar">
+    </div>
+    <transition name="fade">
+      <div class="detail" v-show="detailShow">
+        <div class="detail-wrapper clearfix">
+          <div class="detail-main">
+            <h1 class="name">{{ seller.name }}</h1>
+            <div class="star-wrapper">
+              <star v-bind:size="48" v-bind:score="seller.score"></star>
+            </div>
+            <div class="title">
+              <div class="line"></div>
+              <div class="text">优惠信息</div>
+              <div class="line"></div>
+            </div>
+            <ul class="supports" v-if="seller.supports">
+              <li class="support-item" v-for="(item, index) in seller.supports" :key="index">
+                <span class="icon" v-bind:class="classMap[seller.supports[index].type]"></span>
+                <span class="text">{{ seller.supports[index].description }}</span>
+              </li>
+            </ul>
+            <div class="title">
+              <div class="line"></div>
+              <div class="text">商家公告</div>
+              <div class="line"></div>
+            </div>
+            <div class="bulletin">
+              <p class="content">{{seller.bulletin}}</p>
+            </div>
+          </div>
+        </div>
+        <div class="detail-close" v-on:click="hideDetail">
+          <i class="icon-close"></i>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
+  import star from 'components/star/star';
+
   export default {
     props: {
-     seller: {
-       type: Object
-     }
+      seller: {
+        type: Object
+      }
+    },
+    data() {
+      return {
+        detailShow: false
+      };
+    },
+    methods: {
+      showDetail() {
+        this.detailShow = true;
+      },
+      hideDetail() {
+        this.detailShow = false;
+      }
     },
     created() {
       this.classMap = ['decrease', 'discount', 'special', 'invoice', 'guarantee'];
+    },
+    components: {
+      star
     }
   };
 </script>
@@ -47,8 +101,8 @@
 
   .header
     position: relative
+    background: rgba(7, 17, 27, 0.5)
     color: #fff
-    background: #999
     .content-wrapper
       position: relative
       padding: 24px 12px 18px 24px
@@ -77,9 +131,9 @@
             line-height: 18px
             font-size: 16px
         .description
-            margin-bottom: 10px
-            font-size: 12px
-            line-height: 12px
+          margin-bottom: 10px
+          font-size: 12px
+          line-height: 12px
         .support
           .icon
             display: inline-block
@@ -123,7 +177,7 @@
     .bulletin-wrapper
       height: 28px
       line-height: 28px
-      background-color: rgba(7, 17 ,27 ,0.2)
+      background-color: rgba(7, 17, 27, 0.2)
       padding: 0 22px 0 12px
       white-space: nowrap
       overflow: hidden
@@ -147,5 +201,103 @@
         right: 12px
         top: 8px
         font-size: 10px
+
+    .background
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      filter: blur(10px)
+      z-index: -1
+    .detail
+      position: fixed
+      z-index: 100
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      overflow: auto
+      backdrop-filter: blur(10px)
+      opacity: 1
+      background: rgba(7, 17, 27, 0.8)
+      &.fade-enter-active, &.fade-leave-active
+        transition: all 0.5s
+      &.fade-enter, &.fade-leave-active
+        opacity: 0
+        background: rgba(7, 17, 27, 0)
+      .detail-wrapper
+        min-height: 100%
+      .detail-main
+        margin-top: 64px
+        padding-bottom: 64px
+        .name
+          font-size: 16px
+          font-weight: bold
+          line-height: 32px
+          text-align: center
+        .star-wrapper
+          margin-top: 16px
+          text-align: center
+          padding: 2px 0
+        .title
+          width: 80%;
+          margin: 28px auto 24px auto
+          display: flex
+          .line
+            top: -6px
+            flex: 1
+            position: relative
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2)
+          .text
+            padding: 0 12px
+            font-weight: bold
+            font-size: 14px
+        .supports
+          width: 80%
+          margin: 0 auto
+          .support-item
+            padding: 0 12px
+            margin-bottom: 12px
+            font-size: 0
+            &:last-child
+              margin-bottom: 0
+            .icon
+              display: inline-block
+              width: 16px
+              height: 16px
+              vertical-align: top
+              margin-right: 6px
+              background-size: 16px 16px
+              background-repeat: no-repeat
+              &.decrease
+                bg-image('decrease_2')
+              &.discount
+                bg-image('discount_2')
+              &.guarantee
+                bg-image('guarantee_2')
+              &.invoice
+                bg-image('invoice_2')
+              &.special
+                bg-image('special_2')
+            .text
+              line-height: 16px
+              font-size: 12px
+
+        .bulletin
+          width: 80%
+          margin: 0 auto
+          .content
+            font-size: 12px
+            line-height: 24px
+            padding: 0 12px
+      .detail-close
+        position: relative
+        width: 32px
+        height: 32px
+        margin: -64px auto 0 auto
+        font-size: 32px
+        color: rgb(255, 255, 255, 0.5)
+        clear: both
 
 </style>
