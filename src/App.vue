@@ -13,10 +13,9 @@
           <router-link to="/seller">商家</router-link>
         </div>
       </div>
-      <router-view></router-view>
-      <!--<div class="content">-->
-        <!--I am content-->
-      <!--</div>-->
+    <keep-alive>
+      <router-view v-bind:seller="seller"></router-view>
+    </keep-alive>
   </div>
 </template>
 
